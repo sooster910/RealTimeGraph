@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const Machine= new Schema ({
+const MachineSchema= new Schema ({
     macAddress :String,
     cpuLoad : Number,
     freeMemory : Number,
@@ -16,4 +16,4 @@ const Machine= new Schema ({
 
 });
 
-module.exports = mongoose.model('Machne', Machine);
+module.exports = mongoose.model('Machine', MachineSchema);

@@ -33,7 +33,7 @@ mongoose.connect(process.env.DB_URI, {
   })
   .catch((err) => console.log('Mongoose connection ERROR', err.message));
 
-const Machine  = require('./models/Machne');
+const Machine  = require('./models/Machine');
 
 if (cluster.isMaster) {
     let workers = [];
