@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            margin: 0;
+        }
+
+        canvas {
+            width: 100%;
+            height: 100%
+        }
+    </style>
+</head>
+
+
+<body>
+    <script src="https://threejs.org/build/three.min.js"></script>
+
+
+    <script type="module">
+        import { OrbitControls } from 'https://unpkg.com/three@0.122.0/examples/jsm/controls/OrbitControls.js';
+        var scene = new THREE.Scene();
+        var camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 500);
+        camera.position.set(0, 2, 10);
+
+        var renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        const controls = new OrbitControls(camera, renderer.domElement);
+
+        const points = [];
+
+        let pointCount = 21;
+        let plane, line;
+
+        //GridHelper(size, division, colorCenterLine,colorGrid)
+        scene.add(new THREE.GridHelper(pointCount - 1, pointCount - 1, 0xffc85c));
+
+
+        for (let i = 0; i < pointCount; i++) {
+            points.push({
+                initValue: THREE.Math.randFloat(1, 10),
+                amplitude: THREE.Math.randFloat(1, 2),
+                speed: THREE.Math.randFloat(0.5, 2)
+            })
+        }
+
+
+        console.log('pointCoutn', pointCount);
+        createGraph(pointCount)
+        function createGraph(pointCount) {
+            //PlaneGeometry(with, height,widthSegments,heightSegments)
+            var planeGeom = new THREE.PlaneGeometry(pointCount - 1, 2, pointCount - 1, 1);
+            planeGeom.translate(0, .5, 0);
+
+            plane = new THREE.Mesh(planeGeom, new THREE.MeshBasicMaterial({
+                color: "red",
+                wireframe: false,
+                side: THREE.DoubleSide,
+                transparent: true,
+                opacity: .75
+            }));
+            scene.add(plane);
+
+            //Add line for necessary vertices
+            var lineGeom = new THREE.Geometry();
+            for (let i = 0; i < plane.geometry.parameters.widthSegments + 1; i++) {
+                lineGeom.vertices.push(planeGeom.vertices[i]); // share the upper points of the plane
+            }
+            line = new THREE.Line(lineGeom, new THREE.LineBasicMaterial({
+                color: "aqua"
+            }));
+            plane.add(line);
+
+        }
+        let time = 0;
+        let isStopped = false;
+    
+
+        const render = () => {
+            time = Date.now() * 0.001;
+            requestAnimationFrame(render);
+            
+      
+             points.forEach((p, idx) => {
+                setTimeout(()=>{
+                    plane.geometry.vertices[idx].y = 2.5 + Math.sin((time + p.initValue) * p.speed) * p.amplitude;  // the trick is that indices of upper vertices are from 0 to N consequently in row (r87),
+                 
+                }, 1000*idx)
+                // thus we can assign the data from the `points` array to their Y-coordinates to form the graph
+            });
+            plane.geometry.verticesNeedUpdate = true; // the most important thing when you change coordiantes of vertices
+            line.geometry.verticesNeedUpdate = true; // the most important thing when you change coordiantes of vertices
+            renderer.render(scene, camera);
+        }
+        render();
+    </script>
+</body>
+
+</html>

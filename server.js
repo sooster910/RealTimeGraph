@@ -1,5 +1,6 @@
 require('dotenv').config()
 const express = require('express');
+const mongoose  = require('mongoose');
 const socketio = require('socket.io');
 const net = require('net');
 const io_redis = require('socket.io-redis');
@@ -15,27 +16,34 @@ const freeMemory = os.freemem();
 const totalMemory = os.totalmem();
 const usedMemory = totalMemory - freeMemory;
 const usedMemoryRate = Math.floor((usedMemory / totalMemory) * 100)
-
 const cpus = os.cpus();
-
 // for(var i = 0; i < cpus.length; i++) {
 // 	console.log("CPU[" + (i+1) + "]");
 // 	console.log("model: " + cpus[i].model);
 //     console.log("speed: " + cpus[i].speed);
 //     console.log("times:"+ JSON.stringify(cpus[i].times))
 // }
+console.log('process.env.DB_URI',process.env.DB_URI)
+mongoose.connect(process.env.DB_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => {
+    console.log('MongoDB connected');
+  })
+  .catch((err) => console.log('Mongoose connection ERROR', err.message));
+
+const Machine  = require('./models/Machne');
 
 if (cluster.isMaster) {
     let workers = [];
-
     let spawn = function (i) {
-
         //grabs paricular fork and calls fork
         workers[i] = cluster.fork();
         workers[i].on('exit', (code, signal) => {
             console.log('respawning worker', i);
             spawn(i);
-        })
+        });
     }
 
     for (let i = 0; i < numOfProcesses; i++) {
@@ -43,7 +51,6 @@ if (cluster.isMaster) {
     }
     const worker_index = (ip, len) => {
         return farmhash.fingerprint32(ip) % len;
-
     }
 
     const server = net.createServer({ pauseOnConnect: true }, (connection) => {
@@ -53,7 +60,9 @@ if (cluster.isMaster) {
     });
     server.listen(port);
     console.log(`Master listening on port ${port}`);
+
 } else {
+
     const app = express();
     app.use(express.static(__dirname + '/public'));
     app.use(helmet());
@@ -78,5 +87,5 @@ if (cluster.isMaster) {
         }
         server.emit('connection', connection);
 
-    })
+    });
 }

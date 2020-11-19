@@ -2,11 +2,36 @@ const os  = require('os');
 const io = require('socket.io-client') // use client library
 const socket = io('http://127.0.0.1:9000');
 
-socket.on('connect',()=>{
-    console.log ('connected socket server ')
-}) 
 
-function performanceData(){
+socket.on('connect', ()=>{
+    console.log ('connected socket server ');
+    const nI  = os.networkInterfaces();
+    let macAddress;
+
+    //find non-internal
+    for(let key in nI){
+        if(!nI[key][0].internal){
+            macAddress = nI[key][0].mac;
+            break;
+        }
+    }
+
+    getPerformanceData().then((performanceData)=>{
+        performanceData.macAddress = macAddress
+        socket.emit('initPerformanceData', performanceData)
+    }).catch((err)=>{
+        console.log('err',err);
+    });
+
+
+    let dataInterval = setInterval(async()=>{
+      const performanceData =  await getPerformanceData();
+      console.log(performanceData)
+      socket.emit('performanceData',performanceData);
+    },1000);
+});
+
+function getPerformanceData(){
     return new Promise(async (resolve, reject)=>{
         const cpus = os.cpus();
         // - CPU load (current)
