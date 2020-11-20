@@ -5,28 +5,28 @@ function socketMain(io, socket) {
         console.log('socketmain')
     let uniqueMacAddr;
     socket.on('clientAuth', (data) => {
-        console.log('clientAuth-server,data')
         if (data === 'randomId') {
             socket.join('clients');
-            console.log('joined')
         }
         else if(data==='staticId'){
             socket.join('ui');
-            console.log('create');
+            
         }else{
             socket.disconnect(true);
         }
 
     });
-    socket.on('performanceData', (data) => {
-        // console.log('performanceData',data)
+    //coming from nodeClient.js then send to react client 
+    socket.on('tickData', (data) => {
+    
+        io.to('ui').emit('tickData', data);
+        
     });
 
     socket.on('initPerformanceData', async (data) => {
         uniqueMacAddr = data.macAddress;
         await saveMacAddress(data).catch(() => console.log('err', err));
-
-    })
+    });
 
 }
 

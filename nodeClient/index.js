@@ -23,11 +23,10 @@ socket.on('connect', ()=>{
         console.log('err',err);
     });
 
-
+    //send to socketio server ->socket.io server -> react client 
     let dataInterval = setInterval(async()=>{
       const performanceData =  await getPerformanceData();
-      console.log(performanceData)
-      socket.emit('performanceData',performanceData);
+      socket.emit('tickData',performanceData);
     },1000);
 });
 
