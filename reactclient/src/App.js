@@ -1,5 +1,7 @@
 import logo from './logo.svg';
 import './App.css';
+import socket from './lib/socket';
+
 
 function App() {
   return (

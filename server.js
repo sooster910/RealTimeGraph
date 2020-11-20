@@ -10,6 +10,7 @@ const port = process.env.PORT || 9001
 const socketMain = require('./socketMain');
 const helmet = require('helmet');
 const os = require('os');
+const cors = require('cors')
 const numOfProcesses = os.cpus().length;
 const upTime = os.uptime(); //needed?
 const freeMemory = os.freemem();
@@ -23,7 +24,7 @@ const cpus = os.cpus();
 //     console.log("speed: " + cpus[i].speed);
 //     console.log("times:"+ JSON.stringify(cpus[i].times))
 // }
-console.log('process.env.DB_URI',process.env.DB_URI)
+
 mongoose.connect(process.env.DB_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
@@ -32,8 +33,6 @@ mongoose.connect(process.env.DB_URI, {
     console.log('MongoDB connected');
   })
   .catch((err) => console.log('Mongoose connection ERROR', err.message));
-
-const Machine  = require('./models/Machine');
 
 if (cluster.isMaster) {
     let workers = [];
@@ -63,11 +62,10 @@ if (cluster.isMaster) {
 
 } else {
 
-    const app = express();
+    const app = express(); 
     app.use(express.static(__dirname + '/public'));
-    app.use(helmet());
+    app.use(helmet());  
     const server = app.listen(0, 'localhost');
-    const io = socketio(server);
 
     //redis adapter configure 
     io.adapter(io_redis({ host: 'localhost', port: 6379 }));
@@ -86,6 +84,5 @@ if (cluster.isMaster) {
             return;
         }
         server.emit('connection', connection);
-
     });
 }
