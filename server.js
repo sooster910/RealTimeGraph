@@ -66,7 +66,11 @@ if (cluster.isMaster) {
     app.use(express.static(__dirname + '/public'));
     app.use(helmet());  
     const server = app.listen(0, 'localhost');
-
+    const io = socketio(server,{
+        cors: {
+          origin: '*',
+        }});
+        
     //redis adapter configure 
     io.adapter(io_redis({ host: 'localhost', port: 6379 }));
     server.listen(0, 'localhost', () => {
@@ -78,6 +82,7 @@ if (cluster.isMaster) {
         console.log(`connected to worker: ${cluster.worker.id}`);
     });
 
+   
 
     process.on('message', (message, connection) => {
         if (message !== 'sticky-session:connection') {
