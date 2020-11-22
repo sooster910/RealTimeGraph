@@ -1,27 +1,43 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { Component } from 'react'
 import socket from './lib/socket';
+import Widget from './components/Widget';
+import styled from 'styled-components'
 
+const Button = styled.button``
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+class App extends Component {
+  constructor() {
+    super();
+    this.state = {
+      performData: null
+    };
+  }
+
+  componentDidMount() {
+    socket.on('tickData', (data) => {
+     
+      const dataObj = {};
+      dataObj[data && data.macAddress] = data;
+      this.setState({performData:dataObj});
+    });
+  }
+
+  
+  render() {
+    const {performData} = this.state
+    const widgets=[];
+    Object.entries(performData||{}).forEach(([key,value])=>{
+    
+      widgets.push(<Widget key={key} data={value}/>)
+    });
+ 
+    return (
+      <div>
+      {widgets}
+      </div>
+    )
+  }
 }
 
 export default App;
+
