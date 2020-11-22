@@ -18,7 +18,7 @@ function socketMain(io, socket) {
     });
     //coming from nodeClient.js then send to react client 
     socket.on('tickData', (data) => {
-    
+        uniqueMacAddr = data.macAddress;
         io.to('ui').emit('tickData', data);
         
     });

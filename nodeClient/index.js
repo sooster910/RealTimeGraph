@@ -18,7 +18,7 @@ socket.on('connect', ()=>{
 
     getPerformanceData().then((performanceData)=>{
         performanceData.macAddress = macAddress
-        socket.emit('initPerformanceData', performanceData)
+
     }).catch((err)=>{
         console.log('err',err);
     });
@@ -26,6 +26,7 @@ socket.on('connect', ()=>{
     //send to socketio server ->socket.io server -> react client 
     let dataInterval = setInterval(async()=>{
       const performanceData =  await getPerformanceData();
+      performanceData.macAddress = macAddress;
       socket.emit('tickData',performanceData);
     },1000);
 });
