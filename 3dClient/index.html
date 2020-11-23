@@ -31,7 +31,7 @@
         var renderer = new THREE.WebGLRenderer();
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
-
+        //allows moving camera angle 
         const controls = new OrbitControls(camera, renderer.domElement);
 
         const points = [];
@@ -42,7 +42,6 @@
         //GridHelper(size, division, colorCenterLine,colorGrid)
         scene.add(new THREE.GridHelper(pointCount - 1, pointCount - 1, 0xffc85c));
 
-
         for (let i = 0; i < pointCount; i++) {
             points.push({
                 initValue: THREE.Math.randFloat(1, 10),
@@ -51,13 +50,97 @@
             })
         }
 
+        var geometry1 = new THREE.BoxGeometry(2, 2, 2);
+       
+        var geometry_material1 = new THREE.MeshBasicMaterial({
+                color: "yellow",
+                wireframe: false,
+                // side: THREE.DoubleSide,
+                vertexColors: THREE.FaceColors,
+                transparent: true,
+                opacity: .15
+            });
+          
+        var new_mesh1 =  new THREE.Mesh(geometry1,geometry_material1);
+        geometry1.translate( 1, 1, 1);
+        new_mesh1.scale.y = 10;
+        new_mesh1.geometry.faces[ 8 ].color.setHex( 0x00ffff );
+        scene.add(new_mesh1);
+       
+                //add text to cube 
+//                 var textGeo = new THREE.TextGeometry( text, {
+//     font: font,
+//     size: size,
+//     height: height,
+//     curveSegments: curveSegments,
+//     bevelThickness: bevelThickness,
+//     bevelSize: bevelSize,
+//     bevelEnabled: bevelEnabled,
+//     material: 0,
+//     extrudeMaterial: 1
+// });
+// set the material position and rotation for the text
+var text = new THREE.Object3D();
+const loader = new THREE.FontLoader();
+var text3d;
+loader.load( 'fonts/helvetiker_regular.typeface.json', function ( font ) {
+text3d = new THREE.TextGeometry( 'hello', {
+size: 60,
+height: 1, // this will actually make the object very thin
+curveSegments: 50,
+font: font
+});
+});
+var textMaterial = new THREE.MeshBasicMaterial( { color: 0x000000, overdraw: true } );
+ text = new THREE.Mesh( text3d, textMaterial );
+text.position.set( 1, 2, 1 ); //
+scene.add( text );
+
+//add actual bar from data
+        var geometry2 = new THREE.BoxGeometry(2, 2, 2);
+
+        var geometry_material2 = new THREE.MeshBasicMaterial({
+                color: "blue",
+                wireframe: false,
+                // side: THREE.DoubleSide,
+                vertexColors: THREE.FaceColors,
+                transparent: true,
+                opacity: .70,
+              
+            });
+         var new_mesh2=  new THREE.Mesh(geometry2,geometry_material2);
+        geometry2.translate( 1, 1, 1);
+        new_mesh2.scale.y = 2;
+        new_mesh2.geometry.faces[ 8 ].color.setHex( 0x00ffff );
+        scene.add(new_mesh2);  
+
+
+
+
+        //add line for data spot (will be a height)
+        // var geometry_line = new THREE.Geometry();
+           
+        //     geometry_line.vertices.push(5); // share the upper points of the plane
+            
+        //     let lineShape = new THREE.Line(geometry_line, new THREE.LineBasicMaterial({
+        //         color: "aqua"
+        //     }));
+        //     new_mesh.add(lineShape);
+
+
+        //Grid label
+        // var labelsD = labelAxis(depth, data.labels.z, "z");
+		// 	labelsD.position.x = width;
+		// 	labelsD.position.y = -(height)-40;
+		// 	labelsD.position.z = depth-40;
+		// 	scene.add(labelsD);
 
         console.log('pointCoutn', pointCount);
         createGraph(pointCount)
         function createGraph(pointCount) {
             //PlaneGeometry(with, height,widthSegments,heightSegments)
             var planeGeom = new THREE.PlaneGeometry(pointCount - 1, 2, pointCount - 1, 1);
-            planeGeom.translate(0, .5, 0);
+            planeGeom.translate(0, 1, 0);
 
             plane = new THREE.Mesh(planeGeom, new THREE.MeshBasicMaterial({
                 color: "red",
@@ -82,7 +165,31 @@
         let time = 0;
         let isStopped = false;
     
+        function labelAxis(width, data, direction){
 
+var separator = 2*width/data.length,
+          p = {
+              x:0,
+              y:0,
+              z:0
+          },
+          dobj = new THREE.Object3D();
+
+for ( var i = 0; i < data.length; i ++ ) {
+      var label = makeTextSprite(data[i]);
+
+      label.position.set(p.x,p.y,p.z);
+
+      dobj.add( label );
+      if (direction=="y"){
+          p[direction]+=separator;
+      }else{
+          p[direction]-=separator;
+      }
+
+}
+return dobj;
+}
         const render = () => {
             time = Date.now() * 0.001;
             requestAnimationFrame(render);

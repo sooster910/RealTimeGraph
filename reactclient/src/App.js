@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import socket from './lib/socket';
 import Widget from './components/Widget';
 import styled from 'styled-components'
-
+import Three3D from './components/Three3D';
 const Button = styled.button``
 
 class App extends Component {
@@ -24,7 +24,7 @@ class App extends Component {
 
   
   render() {
-    const {performData} = this.state
+    const {performData} = this.state;
     const widgets=[];
     Object.entries(performData||{}).forEach(([key,value])=>{
     
@@ -34,6 +34,7 @@ class App extends Component {
     return (
       <div>
       {widgets}
+      <Three3D/>
       </div>
     )
   }
