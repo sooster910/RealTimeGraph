@@ -1,3 +1,5 @@
+
+
 .App {
   text-align: center;
 }
@@ -7,6 +9,22 @@
   pointer-events: none;
 }
 
+.button{
+  width: 150px;
+  height: 44px;
+  /* width: 15rem;
+  height: 4rem;
+  border-radius: 1rem;
+  justify-self: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 5px 5px 10px #c8d0e7, -5px -5px 10px #ffffff;
+  transition: .3s ease;
+  background: #9baacf;
+  border-style:none; */
+}
 @media (prefers-reduced-motion: no-preference) {
   .App-logo {
     animation: App-logo-spin infinite 20s linear;
